@@ -22,7 +22,10 @@ import ua.naiksoftware.stomp.dto.StompHeader;
 public class StompAPI {
 
     private StompClient mStompClient;
+
     String BASE_URL = "ws://ec2-13-125-225-233.ap-northeast-2.compute.amazonaws.com:8080/ws/websocket";
+
+
     String TAG = "TAG";
     boolean isUnexpectedClosed;
 
@@ -30,6 +33,7 @@ public class StompAPI {
     private List<User> userList;
 
     private Listener listener;
+    private JobListener jobListener;
 
     @SuppressLint("CheckResult")
     public void initStomp() {
@@ -50,11 +54,19 @@ public class StompAPI {
             }
         });
 
+        mStompClient.topic("/user/queue/role").subscribe(message -> {
+           Log.d("ROLE", message.getPayload());
+           if(jobListener!=null) {
+               jobListener.onJobReceived();
+           }
+        });
+
         JsonObject obj = new JsonObject();
         obj.addProperty("sender", nickname);
         obj.addProperty("type", "JOIN");
 
         mStompClient.send("/app/chat.addUser", obj.toString()).subscribe();
+        mStompClient.send("/app/role", nickname).subscribe();
     }
 
     public void sendMessage(User user, String msg) {
@@ -77,6 +89,10 @@ public class StompAPI {
 
     public interface Listener {
         void onConnected();
+    }
+
+    public interface JobListener {
+        void onJobReceived();
     }
 
 }

@@ -36,7 +36,7 @@ public class MainChatActivity extends AppCompatActivity {
             listView=findViewById(R.id.listview);
             adapter=new ChatAdapter(messageItems,getLayoutInflater());
             listView.setAdapter(adapter);
-    }
+        }
 
     public void clickSend(View view){//firebase DB에 저장할 값들(네임, 메세지, 시간)
             String nickName= "nacho";
